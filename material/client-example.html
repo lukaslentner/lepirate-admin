@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	
+	<title>Le Pirate Client</title>
+	
+	<style>
+	
+		.event {
+			border-bottom: 1px solid black;
+			padding: 20px;
+		}
+		
+		.event img {
+			width: 200px;
+		}
+	
+	</style>
+	
+	<script>
+	
+		const init = () => {
+		
+			const eventsElement = document.getElementById('events');
+			const fallbackImage = 'https://cdn0.iconfinder.com/data/icons/road-sign-flat/614/8_-_Ban-512.png';
+			const webservice = 'https://admin.lepirate-rosenheim.de/webservice/public/events/';
+		
+			const ajax = new XMLHttpRequest();
+			ajax.open('GET', webservice + '?year=2021&include=content,links');
+			ajax.onload = () => {
+				const response = JSON.parse(ajax.responseText);
+				if(ajax.status !== 200) {
+					console.log(response);
+					return;
+				}
+				const events = response;
+				events.forEach(event => {
+					event.startTime = new Date(event.startTime);
+					let result = '';
+					result += `<div class="event">`;
+					result += `<div>Id: ${event.id}</div>`;
+					result += `<div>Version: ${event.version}</div>`;
+					result += `<div>Datum & Startzeit: ${event.startTime}</div>`;
+					result += `<div>Einlass: ${event.entry}</div>`;
+					result += `<div>Titel: ${event.title}</div>`;
+					result += `<div>Untertitel: ${event.subtitle}</div>`;
+					result += `<div>Reihe: ${event.series}</div>`;
+					result += `<div>Text: ${event.text}</div>`;
+					result += `<div>Besetzung: ${event.lineup}</div>`;
+					result += `<div>Bemerkungen: ${event.notes}</div>`;
+					result += `<div>Bild: <img src="${webservice}?image&id=${event.id}" onerror="if(!this.fallback) { this.fallback = true; this.src='${fallbackImage}'; }" /></div>`;
+					result += `<div>Links:</div>`;
+					event.links.forEach((link, index) => {
+						result += `<div>Link ${index + 1}: <a href="${link.target}">${link.text}</a></div>`;
+					});
+					result += `</div>`;
+					eventsElement.innerHTML += result;
+				});
+			};
+			ajax.send();
+		
+		};
+	
+	</script>
+	
+</head>
+<body onload="init(); "> 
+
+	<div id="events"></div>
+	
+</body>
+</html>
