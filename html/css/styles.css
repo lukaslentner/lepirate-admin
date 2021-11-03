@@ -34,6 +34,15 @@ input[type="file"], input[type="hidden"] {
 	display: none !important;
 }
 
+::-webkit-calendar-picker-indicator {
+	margin: 0;
+	padding: 0;
+}
+
+::-webkit-datetime-edit-fields-wrapper {
+	padding: 0;
+}
+
 ::placeholder {
   color: #bbbbbb;
   opacity: 1; /* Firefox */
@@ -162,8 +171,8 @@ main > .content > .form > .formitem > label:not(.no-label):after {
 main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea {
 	font-size: 0.75rem;
 	border: 1px solid #cccccc;
-	padding: 0 4px;
-	height: 30px;
+	padding: 6px;
+	line-height: 160%;
     background-color: transparent;
     box-shadow: none;
 	outline: none;
@@ -185,7 +194,6 @@ main > .content > .form > .formitem > textarea {
 	width: 0;
 	height: 150px;
 	resize: vertical;
-	padding: 4px;
 }
 
 main > .content > .form a {
