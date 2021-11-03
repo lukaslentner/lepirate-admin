@@ -258,8 +258,7 @@ class EventsGateway {
 			
 			$iEvent = new Eluceo\iCal\Domain\Entity\Event(new Eluceo\iCal\Domain\ValueObject\UniqueIdentifier($event['id']));
 			$iEvent->setSummary($event['title'] . (!empty($event['subtitle']) ? ' - ' . $event['subtitle'] : ''));
-			$iEvent->setDescription('Dauer variabel');
-			//$iEvent->setUrl(new Eluceo\iCal\Domain\ValueObject\Uri("https://example.org/calendarevent"));
+			$iEvent->setDescription('(Die Dauer dieser Veranstaltung ist pauschal mit 3 Stunden angegeben. Die tatsächliche Dauer weicht davon ab!)');
 			$iEvent->setOccurrence(new Eluceo\iCal\Domain\ValueObject\TimeSpan(new Eluceo\iCal\Domain\ValueObject\DateTime($startTime, true), new Eluceo\iCal\Domain\ValueObject\DateTime($endTime, true)));
 			$iEvent->setLocation((new Eluceo\iCal\Domain\ValueObject\Location('Ludwigspl. 5/1, 83022 Rosenheim')));
 
