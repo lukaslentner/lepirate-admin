@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: admin.lepirate-rosenheim.de
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Deploy
         run: |
           sudo apt install rclone -y
