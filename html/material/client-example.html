@@ -48,9 +48,9 @@
 					result += `<div>Titel: ${event.title}</div>`;
 					result += `<div>Untertitel: ${event.subtitle}</div>`;
 					result += `<div>Reihe: ${event.series}</div>`;
-					result += `<div>Text: ${event.text}</div>`;
-					result += `<div>Besetzung: ${event.lineup}</div>`;
-					result += `<div>Bemerkungen: ${event.notes}</div>`;
+					result += `<div>Text: ${event.text.replace(/\r\n|\r|\n/g, '<br />')}</div>`;
+					result += `<div>Besetzung: ${event.lineup.replace(/\r\n|\r|\n/g, '<br />')}</div>`;
+					result += `<div>Bemerkungen: ${event.notes.replace(/\r\n|\r|\n/g, '<br />')}</div>`;
 					result += `<div>Bild: <img src="${webservice}?image&id=${event.id}" onerror="if(!this.fallback) { this.fallback = true; this.src='${fallbackImage}'; }" /></div>`;
 					result += `<div>Links:</div>`;
 					event.links.forEach((link, index) => {
