@@ -236,10 +236,10 @@ main > .content > .imageform > .image-controls {
 
 main > .content > .imageform > .image-controls > * {
 	display: inline-block;
+	margin-right: 20px;
 }
 
 main > .content > .imageform > .image-controls > *:nth-child(2) {
-	margin-left: 20px;
 	display: none;
 }
 
