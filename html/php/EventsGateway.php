@@ -261,7 +261,7 @@ class EventsGateway {
 			$iEvent->setDescription('Dauer variabel');
 			//$iEvent->setUrl(new Eluceo\iCal\Domain\ValueObject\Uri("https://example.org/calendarevent"));
 			$iEvent->setOccurrence(new Eluceo\iCal\Domain\ValueObject\TimeSpan(new Eluceo\iCal\Domain\ValueObject\DateTime($startTime, true), new Eluceo\iCal\Domain\ValueObject\DateTime($endTime, true)));
-			$iEvent->setLocation((new Eluceo\iCal\Domain\ValueObject\Location('Ludwigspl. 5/1, 83022 Rosenheim'))->withGeographicPosition(new Eluceo\iCal\Domain\ValueObject\GeographicPosition(47.8556782, 12.1290316)));
+			$iEvent->setLocation((new Eluceo\iCal\Domain\ValueObject\Location('Ludwigspl. 5/1, 83022 Rosenheim')));
 
 			array_push($iEvents, $iEvent);
 			
