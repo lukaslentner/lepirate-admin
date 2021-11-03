@@ -13,11 +13,15 @@ header('Cache-Control: no-cache');
 
 if($_SERVER['REQUEST_METHOD'] === 'GET') {
 	if(isset($_GET['id'])) {
-		if(isset($_GET['image'])) {
+		if(isset($_GET['iCal'])) {
+			$eventsGateway->getICal();
+		} else if(isset($_GET['image'])) {
 			$eventsGateway->getImage();
 		} else {
 			$eventsGateway->get();
 		}
+	} else if(isset($_GET['iCal'])) {
+		$eventsGateway->listComingICal();
 	} else {
 		$eventsGateway->list();
 	}

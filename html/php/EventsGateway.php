@@ -36,15 +36,27 @@ class EventsGateway {
 		$sortDirection = isset($_GET['descending']) ? 'DESC' : 'ASC';
 
 		if($month === null) {
-			$events = $this->db->list('Events', $this->columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection);
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection);
 		} else {
-			$events = $this->db->list('Events', $this->columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection);
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection);
 		}
 		
 		$eventDtos = array_map('self::writeEventDto', $events);
 
-		header('Content-Type: application/json');
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($eventDtos);
+		
+	}
+	
+	function listComingICal() {
+		
+		$events = $this->db->list('Events', self::columns(), '`startTime` > NOW()', '', array(), 'startTime', 'ASC');
+		
+		$iCal = self::writeICalEvents($events);
+
+		header('Content-Type: text/calendar; charset=utf-8');
+		header('Content-Disposition: attachment; filename="cal.ics"');
+		echo $iCal;
 		
 	}
 	
@@ -66,13 +78,30 @@ class EventsGateway {
 			exit;
 		}
 
-		$event = $this->db->get('Events', $this->columns($include), $id);
+		$event = $this->db->get('Events', self::columns($include), $id);
 		
 		$eventDto = self::writeEventDto($event);
 
-		header('Content-Type: application/json');
+		header('Content-Type: application/json; charset=utf-8');
 		header('ETag: ' . $event['version']);
 		echo json_encode($eventDto);
+		
+	}
+	
+	function getICal() {
+		
+		if(!isset($_GET['id'])) {
+			throw new Exception('"id" is not set');
+		}
+		$id = $_GET['id'];
+		
+		$event = $this->db->get('Events', self::columns(), $id);
+		
+		$iCal = self::writeICalEvents(array($event));
+
+		header('Content-Type: text/calendar; charset=utf-8');
+		header('Content-Disposition: attachment; filename="cal.ics"');
+		echo $iCal;
 		
 	}
 	
@@ -122,6 +151,7 @@ class EventsGateway {
 
 		$this->db->put('Events', $this->dbTypes, $event);
 		
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(new stdClass());
 		
 	}
@@ -140,11 +170,12 @@ class EventsGateway {
 
 		$this->db->delete('Events', $id, $version);
 		
+		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode(new stdClass());
 		
 	}
 	
-	private function columns($include) {
+	private static function columns($include = '') {
 		$includes = explode(',', $include);
 		$columns = array('id', 'version', 'startTime', 'entry', 'title', 'subtitle', 'series');
 		if(in_array('content', $includes, TRUE)) {
@@ -205,6 +236,42 @@ class EventsGateway {
 		}
 		
 		return $eventDto;
+		
+	}
+	
+	private static function writeICalEvents($events) {
+		
+		$timeZone = new DateTimeZone('Europe/Berlin');
+		
+		$earliestStartTime = new DateTimeImmutable('now', $timeZone);
+		$latestEndTime = $earliestStartTime;
+		
+		$iEvents = array();
+		foreach($events as $event) {
+			
+			$startTime = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $event['startTime'], $timeZone);
+			$endTime = $startTime->add(new DateInterval('PT3H'));
+			
+			if($endTime > $latestEndTime) {
+				$latestEndTime = $endTime;
+			}
+			
+			$iEvent = new Eluceo\iCal\Domain\Entity\Event(new Eluceo\iCal\Domain\ValueObject\UniqueIdentifier($event['id']));
+			$iEvent->setSummary($event['title'] . (!empty($event['subtitle']) ? ' - ' . $event['subtitle'] : ''));
+			$iEvent->setDescription('(Die Dauer dieser Veranstaltung ist pauschal mit 3 Stunden angegeben. Die tatsächliche Dauer weicht davon ab!)');
+			$iEvent->setOccurrence(new Eluceo\iCal\Domain\ValueObject\TimeSpan(new Eluceo\iCal\Domain\ValueObject\DateTime($startTime, true), new Eluceo\iCal\Domain\ValueObject\DateTime($endTime, true)));
+			$iEvent->setLocation((new Eluceo\iCal\Domain\ValueObject\Location('Ludwigspl. 5/1, 83022 Rosenheim')));
+
+			array_push($iEvents, $iEvent);
+			
+		}
+
+		$iCalendar = new Eluceo\iCal\Domain\Entity\Calendar($iEvents);
+		$iCalendar->addTimeZone(Eluceo\iCal\Domain\Entity\TimeZone::createFromPhpDateTimeZone($timeZone, $earliestStartTime, $latestEndTime));
+
+		$iCalendarFactory = new Eluceo\iCal\Presentation\Factory\CalendarFactory();
+		
+		return $iCalendarFactory->createCalendar($iCalendar);
 		
 	}
 	

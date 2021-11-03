@@ -6,7 +6,7 @@ spl_autoload_register(function($className) {
 
 set_exception_handler(function($exception) {
 	http_response_code(400);
-	header('Content-Type: application/json');
+	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode(array(
 		'error' => $exception->getMessage(),
 		'trace' => _DEBUG ? $exception->getTraceAsString() : ''

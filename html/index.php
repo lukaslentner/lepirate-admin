@@ -12,6 +12,7 @@ $graph = new Graph($oAuth);
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<meta name="theme-color" content="#000000" />
 	
 	<title>Le Pirate Admin</title>
 	

@@ -17,7 +17,9 @@ class DB {
 		
 		$request = $this->handle->stmt_init();
 		$request->prepare('SELECT `' . implode('`,`', $columns) . '` FROM ' . $table . ' WHERE ' . $condition . ' ORDER BY `' . $sortColumn . '` ' . $sortDirection);
-		$request->bind_param($conditionParameterTypes, ...$conditionParameterValues);
+		if($conditionParameterTypes !== '') {
+			$request->bind_param($conditionParameterTypes, ...$conditionParameterValues);
+		}
 		$request->execute();
 		
 		$result = $request->get_result();
