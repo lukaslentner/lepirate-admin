@@ -9,10 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     environment: admin.lepirate-rosenheim.de
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Deploy
+      - name: Install rclone
         run: |
           sudo apt install rclone -y
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure rclone
+        run: |
           rclone config create remote sftp host "web14.ronet.de" user "F16131442495" port "2222" pass "${{ secrets.RCLONE_OBSCURED_PASSWORD }}"
-          rclone sync -v html remote:test
+      - name: Sync
+        run: |
+          rclone sync -v html remote:html
