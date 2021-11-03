@@ -54,6 +54,7 @@ header {
 	align-items: center;
 	border-bottom: 3px solid var(--primary-color);
 	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	z-index: 9999;
 }
 
 header > * {
