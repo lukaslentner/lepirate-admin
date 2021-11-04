@@ -100,6 +100,50 @@ header > .menuitem.active {
 	background-color: var(--primary-color);
 }
 
+#popups {
+	position: fixed;
+	top: 63px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: min(400px, calc(100vw - 20px));
+}
+
+#popups:empty {
+	display: none;
+}
+
+#popups > .popup {
+	background-color: var(--emergency-color);
+	color: white;
+	padding: 6px 12px;
+	margin-bottom: 20px;
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	position: relative;
+}
+
+#popups > .popup > h2 {
+	font-size: 0.8rem;
+	margin: 6px 0;
+	padding: 0;
+	text-align: center;
+}
+
+#popups > .popup > p {
+	font-size: 0.7rem;
+	margin: 6px 0;
+	text-align: center;
+}
+
+#popups > .popup > .timer {
+	background-color: white;
+	opacity: 0.5;
+	height: 3px;
+	width: 0; 
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
 main {
 	margin: 53px 0 0 0;
 	display: none;

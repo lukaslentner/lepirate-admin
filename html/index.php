@@ -31,6 +31,8 @@ $graph = new Graph($oAuth);
 		<a class="menuitem active" href="#"><img src="images/events.png" /></a>
 	</header>
 	
+	<aside id="popups"></aside>
+	
 	<main id="view-list">
 	
 		<aside class="filter">

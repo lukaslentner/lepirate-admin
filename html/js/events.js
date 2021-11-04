@@ -70,6 +70,23 @@ const form_addLink = link => {
 	
 };
 
+const createPopup = content => {
+	const lifeTime = 10000;
+	const timerTime = 50;
+	let timerCount = 0;
+	const id = uuid();
+	$('#popups').append(`<section id="popup-${id}" class="popup">${content}<div class="timer"></div></section>`);
+	const interval = window.setInterval(() => {
+		timerCount++;
+		const newWidth = (timerCount * 100 * timerTime / lifeTime).toString() + '%';
+		$('#popup-' + id + ' .timer').width(newWidth);
+	}, timerTime);
+	window.setTimeout(() => {
+		clearInterval(interval);
+		$('#popup-' + id).remove();
+	}, lifeTime);
+};
+
 const form_init = () => {
 	$('#view-form .imageform .image-controls :nth-child(1) a').on('click', e => {
 		e.preventDefault();
@@ -90,6 +107,8 @@ const form_init = () => {
 			$('#view-form .imageform .image-wrapper').removeClass('loading');
 			if(e2.currentTarget.result.length > 16777215) {
 				console.error('Image too big');
+				form_setImage(null);
+				createPopup(`<h2>Bild zu groß</h2>`);
 				return;
 			}
 			form_setImage(e2.currentTarget.result);
@@ -122,9 +141,14 @@ const form_init = () => {
 		
 			},
 			error: (xhr, status, error) => {
-				//TODO
+				
 				console.error(error);
 				console.error(xhr);
+				
+				$('main').hide();
+				$('#view-form').show();
+				
+				createPopup(`<h2>Fehler beim Löschen</h2><p>${xhr.responseJSON.message}</p>`);
 				
 			},
 			method: 'DELETE'
@@ -139,8 +163,9 @@ const form_init = () => {
 		if($('#view-form input:invalid').length > 0) {
 			console.error('Form invalid:', $('#view-form input:invalid'));
 			$('html, body').animate({
-				scrollTop: $('#view-form input:invalid').offset().top - 100
+				scrollTop: $('#view-form input:invalid').offset().top - 120
 			}, 300);
+			createPopup(`<h2>Formular nicht ausgefüllt</h2>`);
 			return;
 		}
 		
@@ -165,9 +190,14 @@ const form_init = () => {
 		
 			},
 			error: (xhr, status, error) => {
-				//TODO
+				
 				console.error(error);
 				console.error(xhr);
+				
+				$('main').hide();
+				$('#view-form').show();
+				
+				createPopup(`<h2>Fehler beim Speichern</h2><p>${xhr.responseJSON.message}</p>`);
 				
 			},
 			method: 'PUT'
@@ -302,9 +332,11 @@ const route_list = hashParams => {
 	
 		},
 		error: (xhr, status, error) => {
-			//TODO
+				
 			console.error(error);
 			console.error(xhr);
+			
+			createPopup(`<h2>Fehler beim Laden</h2><p>${xhr.responseJSON.message}</p>`);
 			
 		},
 		method: 'GET'
@@ -395,9 +427,13 @@ const route_edit = hashParams => {
 	
 		},
 		error: (xhr, status, error) => {
-			//TODO
+				
 			console.error(error);
 			console.error(xhr);
+			
+			window.history.back();
+			
+			createPopup(`<h2>Fehler beim Laden</h2><p>${xhr.responseJSON.message}</p>`);
 			
 		},
 		method: 'GET'
