@@ -67,15 +67,23 @@ class DB {
 	
 	function put($table, $valueTypes, $values) {
 		
-		if($values['version'] !== $this->getVersion($table, $values['id'])) {
+		$currentVersion = $this->getVersion($table, $values['id']);
+		$isUpdate = $currentVersion !== NULL;
+		
+		if($values['version'] !== $currentVersion) {
 			throw new Exception('Record was changed meanwhile');
 		}
 		
 		$values['version'] = time();
 		
 		$request = $this->handle->stmt_init();
-		$request->prepare('REPLACE INTO ' . $table . ' (`' . implode('`,`', array_keys($values)) . '`) VALUES (' . str_repeat('?,', count($values) - 1) . '?)');
-		$request->bind_param($valueTypes, ...array_values($values));
+		if($isUpdate) {
+			$request->prepare('UPDATE ' . $table . ' SET `' . implode('` = ?,`', array_keys($values)) . '` = ? WHERE `id` = ?');
+			$request->bind_param($valueTypes . 's', ...array_merge(array_values($values), array($values['id'])));
+		} else {
+			$request->prepare('INSERT INTO ' . $table . ' (`' . implode('`,`', array_keys($values)) . '`) VALUES (' . str_repeat('?,', count($values) - 1) . '?)');
+			$request->bind_param($valueTypes, ...array_values($values));
+		}
 		$request->execute();
 		
 		$rowCount = $request->affected_rows;
