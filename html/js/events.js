@@ -349,12 +349,13 @@ const form_set = event => {
 	$('#view-form-input-version'       ).val(event.version ?? '');
 	$('#view-form-input-startTime-date').val(event.startTime.substr(0, 10));
 	$('#view-form-input-startTime-time').val(event.startTime.substr(11, 5));
-	$('#view-form-input-entry'         ).val(event.entry);
 	$('#view-form-input-title'         ).val(event.title);
 	$('#view-form-input-subtitle'      ).val(event.subtitle);
 	$('#view-form-input-series'        ).val(event.series);
 	$('#view-form-input-text'          ).val(event.text);
 	$('#view-form-input-lineup'        ).val(event.lineup);
+	$('#view-form-input-price'         ).val(event.price);
+	$('#view-form-input-entry'         ).val(event.entry ?? '');
 	$('#view-form-input-notes'         ).val(event.notes);
 	form_setImage(event.image);
 	form_clearLinks();
@@ -366,12 +367,13 @@ const form_get = () => {
 		id: $('#view-form-input-id').val(),
 		version: parseInt($('#view-form-input-version').val()) || null,
 		startTime: $('#view-form-input-startTime-date').val() + 'T' + $('#view-form-input-startTime-time').val(),
-		entry: $('#view-form-input-entry').val(),
 		title: $('#view-form-input-title').val(),
 		subtitle: $('#view-form-input-subtitle').val(),
 		series: $('#view-form-input-series').val(),
 		text: $('#view-form-input-text').val(),
 		lineup: $('#view-form-input-lineup').val(),
+		price: $('#view-form-input-price').val(),
+		entry: $('#view-form-input-entry').val() || null,
 		notes: $('#view-form-input-notes').val(),
 		image: $('#view-form-input-image').val() || null,
 		links: $('#view-form .linkform > .link').get().map(link => { return { text: $(link).find('input[type="text"]').val(), target: $(link).find('input[type="url"]').val() }; })
@@ -389,18 +391,18 @@ const route_create = hashParams => {
 	form_set({
 		id: uuid(),
 		version: null,
-		startTime: hashParams.get('date') + 'T00:00',
-		entry: '',
+		startTime: hashParams.get('date') + 'T20:00',
 		title: '',
 		subtitle: '',
 		series: '',
 		text: '',
 		lineup: '',
+		price: '',
+		entry: '19:00',
 		notes: '',
 		image: null,
 		links: []
 	});
-	$('#view-form-input-startTime-time').val('');
 	
 	$('main').hide();
 	$('#view-form').show();

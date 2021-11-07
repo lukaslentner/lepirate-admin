@@ -89,10 +89,6 @@ $graph = new Graph($oAuth);
 					<input id="view-form-input-startTime-date" type="date" required="required" />
 					<input id="view-form-input-startTime-time" type="time" required="required" style="flex: 1; " />
 				</div>
-				<div class="formitem size-small">
-					<label for="view-form-input-entry">Einlass</label>
-					<input id="view-form-input-entry" type="text" maxlength="255" />
-				</div>
 				<div class="formitem size-middle">
 					<label for="view-form-input-title">Titel</label>
 					<input id="view-form-input-title" type="text" maxlength="255" required="required" />
@@ -116,6 +112,14 @@ $graph = new Graph($oAuth);
 				<div class="formitem">
 					<label for="view-form-input-lineup">Besetzung</label>
 					<textarea id="view-form-input-lineup" maxlength="16777215"></textarea>
+				</div>
+				<div class="formitem size-small">
+					<label for="view-form-input-price">Eintrittspreis</label>
+					<input id="view-form-input-price" type="text" maxlength="255" />
+				</div>
+				<div class="formitem size-small">
+					<label for="view-form-input-entry">Einlass</label>
+					<input id="view-form-input-entry" type="time" />
 				</div>
 				<div class="formitem">
 					<label for="view-form-input-notes">Bemerkung</label>

@@ -11,7 +11,7 @@ class EventsGateway {
 	function __construct($db) {
 		$this->schema = json_decode(file_get_contents(dirname(__FILE__) . '/EventsSchema.json'), FALSE);
 		$this->db = $db;
-		$this->dbTypes = 'sissssssssss';
+		$this->dbTypes = 'sisssssssssss';
     }
 	
 	function list() {
@@ -200,9 +200,9 @@ class EventsGateway {
 	
 	private static function columns($include = '') {
 		$includes = explode(',', $include);
-		$columns = array('id', 'version', 'startTime', 'entry', 'title', 'subtitle', 'series');
+		$columns = array('id', 'version', 'startTime', 'title', 'subtitle', 'series');
 		if(in_array('content', $includes, TRUE)) {
-			$columns = array_merge($columns, array('text', 'lineup', 'notes'));
+			$columns = array_merge($columns, array('text', 'lineup', 'price', 'entry', 'notes'));
 		}
 		if(in_array('image', $includes, TRUE)) {
 			$columns = array_merge($columns, array('image'));
@@ -219,12 +219,13 @@ class EventsGateway {
 		$event['id']        = $eventDto->id;
 		$event['version']   = $eventDto->version;
 		$event['startTime'] = substr($eventDto->startTime, 0, 10) . ' ' . substr($eventDto->startTime, 11, 5) . ':00';
-		$event['entry']     = $eventDto->entry;
 		$event['title']     = $eventDto->title;
 		$event['subtitle']  = $eventDto->subtitle;
 		$event['series']    = $eventDto->series;
 		$event['text']      = $eventDto->text;
 		$event['lineup']    = $eventDto->lineup;
+		$event['price']     = $eventDto->price;
+		$event['entry']     = $eventDto->entry === null ? null : $eventDto->entry . ':00';
 		$event['notes']     = $eventDto->notes;
 		$event['image']     = $eventDto->image;
 		$event['links']     = json_encode($eventDto->links);
@@ -239,7 +240,6 @@ class EventsGateway {
 		$eventDto['id']        = $event['id'];
 		$eventDto['version']   = $event['version'];
 		$eventDto['startTime'] = substr($event['startTime'], 0, 10) . 'T' . substr($event['startTime'], 11, 5);
-		$eventDto['entry']     = $event['entry'];
 		$eventDto['title']     = $event['title'];
 		$eventDto['subtitle']  = $event['subtitle'];
 		$eventDto['series']    = $event['series'];
@@ -247,6 +247,8 @@ class EventsGateway {
 		if(array_key_exists('text', $event)) {
 			$eventDto['text']   = $event['text'];
 			$eventDto['lineup'] = $event['lineup'];
+			$eventDto['price']  = $event['price'];
+			$eventDto['entry']  = substr($event['entry'], 0, 5);
 			$eventDto['notes']  = $event['notes'];
 		}
 		
