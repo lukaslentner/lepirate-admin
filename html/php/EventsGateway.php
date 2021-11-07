@@ -15,16 +15,35 @@ class EventsGateway {
     }
 	
 	function list() {
-		
-		if(!isset($_GET['year']) || !is_numeric($_GET['year'])) {
-			throw new Exception('"year" is not set or is not numeric');
+
+		if(!isset($_GET['upcoming'])) {
+			$upcoming = null;
+		} else if(!is_numeric($_GET['upcoming'])) {
+			$upcoming = -1;
+		} else {
+			$upcoming = intval($_GET['upcoming']);
 		}
-		$year = intval($_GET['year']);
+
+		if(!isset($_GET['upcomingDays']) || !is_numeric($_GET['upcomingDays'])) {
+			$upcomingDays = null;
+		} else {
+			$upcomingDays = intval($_GET['upcomingDays']);
+		}
+
+		if(!isset($_GET['year']) || !is_numeric($_GET['year'])) {
+			$year = null;
+		} else {
+			$year = intval($_GET['year']);
+		}
 
 		if(!isset($_GET['month']) || !is_numeric($_GET['month'])) {
 			$month = null;
 		} else {
 			$month = intval($_GET['month']);
+		}
+		
+		if($upcoming === null && $upcomingDays === null && $year === null) {
+			throw new Exception('No filter present');
 		}
 
 		if(!isset($_GET['include'])) {
@@ -35,10 +54,14 @@ class EventsGateway {
 		
 		$sortDirection = isset($_GET['descending']) ? 'DESC' : 'ASC';
 
-		if($month === null) {
-			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection);
+		if($upcoming !== null) {
+			$events = $this->db->list('Events', self::columns($include), '`startTime` > NOW()', '', array(), 'startTime', $sortDirection, $upcoming >= 0 ? $upcoming : null);
+		} else if($upcomingDays !== null) {
+			$events = $this->db->list('Events', self::columns($include), '`startTime` > NOW() AND `startTime` <= NOW() + INTERVAL ? DAY', 'i', array($upcomingDays), 'startTime', $sortDirection, null);
+		} else if($month === null) {
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection, null);
 		} else {
-			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection);
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection, null);
 		}
 		
 		$eventDtos = array_map('self::writeEventDto', $events);
@@ -50,7 +73,7 @@ class EventsGateway {
 	
 	function listComingICal() {
 		
-		$events = $this->db->list('Events', self::columns(), '`startTime` > NOW()', '', array(), 'startTime', 'ASC');
+		$events = $this->db->list('Events', self::columns(), '`startTime` > NOW()', '', array(), 'startTime', 'ASC', null);
 		
 		$iCal = self::writeICalEvents($events);
 

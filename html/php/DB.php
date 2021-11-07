@@ -13,10 +13,10 @@ class DB {
 	
 	}
 	
-	function list($table, $columns, $condition, $conditionParameterTypes, $conditionParameterValues, $sortColumn, $sortDirection) {
+	function list($table, $columns, $condition, $conditionParameterTypes, $conditionParameterValues, $sortColumn, $sortDirection, $limit) {
 		
 		$request = $this->handle->stmt_init();
-		$request->prepare('SELECT `' . implode('`,`', $columns) . '` FROM ' . $table . ' WHERE ' . $condition . ' ORDER BY `' . $sortColumn . '` ' . $sortDirection);
+		$request->prepare('SELECT `' . implode('`,`', $columns) . '` FROM ' . $table . ' WHERE ' . $condition . ' ORDER BY `' . $sortColumn . '` ' . $sortDirection . ($limit !== null ? ' LIMIT ' . $limit : ''));
 		if($conditionParameterTypes !== '') {
 			$request->bind_param($conditionParameterTypes, ...$conditionParameterValues);
 		}
