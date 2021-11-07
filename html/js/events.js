@@ -291,8 +291,8 @@ const route_list = hashParams => {
 				<span class="marker"></span>
 				<span class="monthday">${dayDate.getDate()}</span>
 				<span class="weekday">${weekdayNicks[dayDate.getDay()]}</span>
-				<span class="events"></span>
 				<a class="tool create" href="#">+</a>
+				<span class="events"></span>
 			</section>`);
 		
 	}
