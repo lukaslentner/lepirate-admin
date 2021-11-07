@@ -28,6 +28,7 @@ a:link, a:visited, a:focus, a:active, a:hover {
 
 input, textarea {
 	font-family: sans-serif;
+	user-select: text;
 }
 
 input[type="file"], input[type="hidden"] {
