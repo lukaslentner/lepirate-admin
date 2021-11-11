@@ -10,11 +10,9 @@
 			"minimum": 0
 		},
 		"organizer": {
-			"type": "string",
 			"enum": ["club", "bar"]
 		},
 		"status": {
-			"type": "string",
 			"enum": ["blocked", "commited", "announced", "published"]
 		},
 		"startTime": {
