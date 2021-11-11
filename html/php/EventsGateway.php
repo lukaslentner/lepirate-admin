@@ -11,7 +11,7 @@ class EventsGateway {
 	function __construct($db) {
 		$this->schema = json_decode(file_get_contents(dirname(__FILE__) . '/EventsSchema.json'), FALSE);
 		$this->db = $db;
-		$this->dbTypes = 'sisssssssssss';
+		$this->dbTypes = 'sisssssssssssssss';
     }
 	
 	function list() {
@@ -200,7 +200,7 @@ class EventsGateway {
 	
 	private static function columns($include = '') {
 		$includes = explode(',', $include);
-		$columns = array('id', 'version', 'startTime', 'title', 'subtitle', 'series');
+		$columns = array('id', 'version', 'organizer', 'status', 'startTime', 'title', 'subtitle', 'series', 'color', 'warning');
 		if(in_array('content', $includes, TRUE)) {
 			$columns = array_merge($columns, array('text', 'lineup', 'price', 'entry', 'notes'));
 		}
@@ -218,10 +218,14 @@ class EventsGateway {
 		$event = array();
 		$event['id']        = $eventDto->id;
 		$event['version']   = $eventDto->version;
+		$event['organizer'] = $eventDto->organizer;
+		$event['status']    = $eventDto->status;
 		$event['startTime'] = substr($eventDto->startTime, 0, 10) . ' ' . substr($eventDto->startTime, 11, 5) . ':00';
 		$event['title']     = $eventDto->title;
 		$event['subtitle']  = $eventDto->subtitle;
 		$event['series']    = $eventDto->series;
+		$event['color']     = $eventDto->color;
+		$event['warning']   = $eventDto->warning;
 		$event['text']      = $eventDto->text;
 		$event['lineup']    = $eventDto->lineup;
 		$event['price']     = $eventDto->price;
@@ -239,10 +243,14 @@ class EventsGateway {
 		$eventDto = array();
 		$eventDto['id']        = $event['id'];
 		$eventDto['version']   = $event['version'];
+		$eventDto['organizer'] = $event['organizer'];
+		$eventDto['status']    = $event['status'];
 		$eventDto['startTime'] = substr($event['startTime'], 0, 10) . 'T' . substr($event['startTime'], 11, 5);
 		$eventDto['title']     = $event['title'];
 		$eventDto['subtitle']  = $event['subtitle'];
 		$eventDto['series']    = $event['series'];
+		$eventDto['color']     = $event['color'];
+		$eventDto['warning']   = $event['warning'];
 		
 		if(array_key_exists('text', $event)) {
 			$eventDto['text']   = $event['text'];

@@ -26,8 +26,11 @@ a:link, a:visited, a:focus, a:active, a:hover {
 	color: inherit;
 }
 
-input, textarea {
+input, textarea, select {
 	font-family: sans-serif;
+}
+
+input, textarea {
 	user-select: text;
 }
 
@@ -213,7 +216,7 @@ main > .content > .form > .formitem > label:not(.no-label):after {
 	content: ':'
 }
 
-main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea {
+main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea, main > .content > .form > .formitem > select {
 	font-size: 0.75rem;
 	border: 1px solid #cccccc;
 	padding: 6px;
@@ -223,15 +226,15 @@ main > .content > .form > .formitem > input, main > .content > .form > .formitem
 	outline: none;
 }
 
-main > .content > .form > .formitem > input:focus, main > .content > .form > .formitem > textarea:focus {
+main > .content > .form > .formitem > input:focus, main > .content > .form > .formitem > textarea:focus, main > .content > .form > .formitem > select:focus {
 	border-color: var(--primary-color);
 }
 
-main > .content > .form > .formitem > input:invalid, main > .content > .form > .formitem > textarea:invalid {
+main > .content > .form > .formitem > input:invalid, main > .content > .form > .formitem > textarea:invalid, main > .content > .form > .formitem > select:invalid {
 	border-color: var(--emergency-color);
 }
 
-main > .content > .form > .formitem > input {
+main > .content > .form > .formitem > input, main > .content > .form > .formitem > select {
 	width: 0;
 }
 

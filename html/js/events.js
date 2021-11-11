@@ -347,11 +347,15 @@ const route_list = hashParams => {
 const form_set = event => {
 	$('#view-form-input-id'            ).val(event.id);
 	$('#view-form-input-version'       ).val(event.version ?? '');
+	$('#view-form-input-organizer'     ).val(event.organizer);
+	$('#view-form-input-status'        ).val(event.status);
 	$('#view-form-input-startTime-date').val(event.startTime.substr(0, 10));
 	$('#view-form-input-startTime-time').val(event.startTime.substr(11, 5));
 	$('#view-form-input-title'         ).val(event.title);
 	$('#view-form-input-subtitle'      ).val(event.subtitle);
 	$('#view-form-input-series'        ).val(event.series);
+	$('#view-form-input-color'         ).val(event.color);
+	$('#view-form-input-warning'       ).val(event.warning);
 	$('#view-form-input-text'          ).val(event.text);
 	$('#view-form-input-lineup'        ).val(event.lineup);
 	$('#view-form-input-price'         ).val(event.price);
@@ -366,10 +370,14 @@ const form_get = () => {
 	return {
 		id: $('#view-form-input-id').val(),
 		version: parseInt($('#view-form-input-version').val()) || null,
+		organizer: $('#view-form-input-organizer').val(),
+		status: $('#view-form-input-status').val(),
 		startTime: $('#view-form-input-startTime-date').val() + 'T' + $('#view-form-input-startTime-time').val(),
 		title: $('#view-form-input-title').val(),
 		subtitle: $('#view-form-input-subtitle').val(),
 		series: $('#view-form-input-series').val(),
+		color: $('#view-form-input-color').val(),
+		warning: $('#view-form-input-warning').val(),
 		text: $('#view-form-input-text').val(),
 		lineup: $('#view-form-input-lineup').val(),
 		price: $('#view-form-input-price').val(),
@@ -391,10 +399,14 @@ const route_create = hashParams => {
 	form_set({
 		id: uuid(),
 		version: null,
+		organizer: 'club',
+		status: 'blocked',
 		startTime: hashParams.get('date') + 'T20:00',
 		title: '',
 		subtitle: '',
 		series: '',
+		color: '#333333',
+		warning: '',
 		text: '',
 		lineup: '',
 		price: '',
