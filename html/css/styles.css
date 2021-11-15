@@ -26,6 +26,10 @@ a:link, a:visited, a:focus, a:active, a:hover {
 	color: inherit;
 }
 
+input, select {
+	height: 34px;
+}
+
 input, textarea, select {
 	font-family: sans-serif;
 }
