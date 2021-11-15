@@ -51,6 +51,10 @@ input[type="file"], input[type="hidden"] {
 	padding: 0;
 }
 
+::-webkit-color-swatch {
+	border-width: 0;
+}
+
 ::placeholder {
   color: #bbbbbb;
   opacity: 1; /* Firefox */
