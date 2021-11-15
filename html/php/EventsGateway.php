@@ -168,6 +168,7 @@ class EventsGateway {
 			foreach($validator->getErrors() as $error) {
 				$errorMessage .= '\n' . $error['property'] . ': ' . $error['message'];
 			}
+			throw new Exception($errorMessage);
 		}
 		
 		$event = self::readEventDto($eventDto);
