@@ -32,7 +32,6 @@ input, select, textarea {
 	line-height: 20px;
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	font-family: inherit;
 	font-size: inherit;
 }
@@ -58,8 +57,15 @@ select {
 	padding: 0;
 }
 
+::-webkit-datetime-edit {
+	display: flex;
+	align-items: center;
+	background-color: red;
+}
+
 ::-webkit-datetime-edit-fields-wrapper {
 	padding: 0;
+	background-color: blue;
 }
 
 ::-webkit-color-swatch-wrapper {
