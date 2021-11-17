@@ -27,8 +27,7 @@ a:link, a:visited, a:focus, a:active, a:hover {
 }
 
 input, select, textarea {
-	appearance: none;
-	padding: 6px 10px;
+	padding: 6px;
 	height: 34px;
 	line-height: 20px;
 	display: flex;
@@ -36,12 +35,6 @@ input, select, textarea {
 	justify-content: center;
 	font-family: inherit;
 	font-size: inherit;
-}
-
-select {
-  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
-  background-repeat: no-repeat;
-  background-position: 100% 4px;
 }
 
 input, textarea {
@@ -52,8 +45,12 @@ input[type="file"], input[type="hidden"] {
 	display: none !important;
 }
 
-input[type="color"] {
-	padding: 4px;
+input[type="date"], input[type="time"] {
+	padding-left: calc(6px - 1px);
+}
+
+select {
+	padding-left: calc(6px - 4px);
 }
 
 ::-webkit-calendar-picker-indicator {
