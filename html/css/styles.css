@@ -26,12 +26,22 @@ a:link, a:visited, a:focus, a:active, a:hover {
 	color: inherit;
 }
 
-input, select {
+input, select, textarea {
+	appearance: none;
+	padding: 6px 10px;
 	height: 34px;
+	line-height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: inherit;
+	font-size: inherit;
 }
 
-input, textarea, select {
-	font-family: sans-serif;
+select {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 100% 4px;
 }
 
 input, textarea {
@@ -42,12 +52,20 @@ input[type="file"], input[type="hidden"] {
 	display: none !important;
 }
 
+input[type="color"] {
+	padding: 4px;
+}
+
 ::-webkit-calendar-picker-indicator {
 	margin: 0;
 	padding: 0;
 }
 
 ::-webkit-datetime-edit-fields-wrapper {
+	padding: 0;
+}
+
+::-webkit-color-swatch-wrapper {
 	padding: 0;
 }
 
@@ -225,10 +243,7 @@ main > .content > .form > .formitem > label:not(.no-label):after {
 }
 
 main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea, main > .content > .form > .formitem > select {
-	font-size: 0.75rem;
 	border: 1px solid #cccccc;
-	padding: 6px;
-	line-height: 160%;
     background-color: transparent;
     box-shadow: none;
 	outline: none;
@@ -242,12 +257,11 @@ main > .content > .form > .formitem > input:invalid, main > .content > .form > .
 	border-color: var(--emergency-color);
 }
 
-main > .content > .form > .formitem > input, main > .content > .form > .formitem > select {
+main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea, main > .content > .form > .formitem > select {
 	width: 0;
 }
 
 main > .content > .form > .formitem > textarea {
-	width: 0;
 	height: 150px;
 	resize: vertical;
 }
