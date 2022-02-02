@@ -359,8 +359,8 @@ const form_set = event => {
 	$('#view-form-input-version'       ).val(event.version ?? '');
 	$('#view-form-input-organizer'     ).val(event.organizer);
 	$('#view-form-input-status'        ).val(event.status);
-	$('#view-form-input-startTime-date').val(event.startTime === '' ? '' : event.startTime.substr(0, 10));
-	$('#view-form-input-startTime-time').val(event.startTime === '' ? '' : event.startTime.substr(11, 5));
+	$('#view-form-input-startTime-date').val(event.startTime.split('T')[0]);
+	$('#view-form-input-startTime-time').val(event.startTime.split('T')[1]);
 	$('#view-form-input-title'         ).val(event.title);
 	$('#view-form-input-subtitle'      ).val(event.subtitle);
 	$('#view-form-input-series'        ).val(event.series);
@@ -484,7 +484,7 @@ const route_copy = hashParams => {
 			data.id = uuid();
 			data.version = null;
 			data.status = 'blocked';
-			data.startTime = '';
+			data.startTime = 'T' + data.startTime.split('T')[1];
 			form_set(data);
 			
 			$('main').hide();
