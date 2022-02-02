@@ -258,7 +258,7 @@ main > .content > .form > .formitem > input, main > .content > .form > .formitem
 }
 
 main > .content > .form > .formitem > textarea {
-	height: 150px;
+	height: 100px;
 	resize: vertical;
 }
 
@@ -356,6 +356,10 @@ main > .content > .buttonbar a.emergency:hover {
 
 main > .content > .buttonbar a.emergency:active {
 	background-color: var(--emergency-color-light);
+}
+
+#view-form-input-text {
+	height: 300px;
 }
 
 #view-list > .filter {
