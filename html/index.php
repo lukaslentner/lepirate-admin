@@ -176,6 +176,7 @@ $graph = new Graph($oAuth);
 	
 			<section class="buttonbar">
 				<a id="view-form-button-delete" class="emergency" href="#">Löschen</a>
+				<a id="view-form-button-copy" href="#">Kopie erstellen</a>
 				<span class="flex-filler"></span>
 				<div class="group">
 					<a id="view-form-button-back" href="#">Zurück</a>

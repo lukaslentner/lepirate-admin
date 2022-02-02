@@ -154,6 +154,17 @@ const form_init = () => {
 			method: 'DELETE'
 		});
 	});
+	$('#view-form-button-copy').on('click', e => {
+		e.preventDefault();
+		
+		const formData = form_get();
+		
+		const newHashParams = new URLSearchParams();
+		newHashParams.set('action', 'copy');
+		newHashParams.set('id', formData.id);
+				
+		window.location.hash = '#' + newHashParams.toString();
+	});
 	$('#view-form-button-back').on('click', e => {
 		e.preventDefault();
 		window.history.back();
@@ -252,13 +263,12 @@ const route = () => {
 	
 	if(hashParams.get('action') === 'list') {
 		route_list(hashParams);
-		return;
 	} else if(hashParams.get('action') === 'create') {
 		route_create(hashParams);
-		return;
 	} else if(hashParams.get('action') === 'edit') {
 		route_edit(hashParams);
-		return;
+	} else if(hashParams.get('action') === 'copy') {
+		route_copy(hashParams);
 	}
 	
 };
@@ -349,8 +359,8 @@ const form_set = event => {
 	$('#view-form-input-version'       ).val(event.version ?? '');
 	$('#view-form-input-organizer'     ).val(event.organizer);
 	$('#view-form-input-status'        ).val(event.status);
-	$('#view-form-input-startTime-date').val(event.startTime.substr(0, 10));
-	$('#view-form-input-startTime-time').val(event.startTime.substr(11, 5));
+	$('#view-form-input-startTime-date').val(event.startTime === '' ? '' : event.startTime.substr(0, 10));
+	$('#view-form-input-startTime-time').val(event.startTime === '' ? '' : event.startTime.substr(11, 5));
 	$('#view-form-input-title'         ).val(event.title);
 	$('#view-form-input-subtitle'      ).val(event.subtitle);
 	$('#view-form-input-series'        ).val(event.series);
@@ -395,6 +405,7 @@ const route_create = hashParams => {
 	
 	$('#view-form h2').text('Veranstaltung erstellen');
 	$('#view-form-button-delete').hide();
+	$('#view-form-button-copy').hide();
 	
 	form_set({
 		id: uuid(),
@@ -428,12 +439,52 @@ const route_edit = hashParams => {
 	
 	$('#view-form h2').text('Veranstaltung bearbeiten');
 	$('#view-form-button-delete').show();
+	$('#view-form-button-copy').show();
 	
 	$.ajax({
 		dataType: 'json',
 		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,links',
 		success: (data, status, xhr) => {
 			
+			form_set(data);
+			
+			$('main').hide();
+			$('#view-form').show();
+	
+		},
+		error: (xhr, status, error) => {
+				
+			console.error(error);
+			console.error(xhr);
+			
+			window.history.back();
+			
+			createPopup(`<h2>Fehler beim Laden</h2><p>${xhr.responseJSON.message}</p>`);
+			
+		},
+		method: 'GET'
+	});
+	
+};
+
+const route_copy = hashParams => {
+	
+	$('main').hide();
+	$('#view-loading').show();
+	
+	$('#view-form h2').text('Veranstaltungskopie erstellen');
+	$('#view-form-button-delete').hide();
+	$('#view-form-button-copy').hide();
+	
+	$.ajax({
+		dataType: 'json',
+		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,links',
+		success: (data, status, xhr) => {
+			
+			data.id = uuid();
+			data.version = null;
+			data.status = 'blocked';
+			data.startTime = '';
 			form_set(data);
 			
 			$('main').hide();
