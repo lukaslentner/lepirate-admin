@@ -1,6 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__) . '/include.php');
+header('Cache-Control: no-cache');
+
+require_once(dirname(__FILE__) . '/php/include.php');
 
 $oAuth = new OAuth();
 $graph = new Graph($oAuth);
@@ -31,6 +33,8 @@ $graph = new Graph($oAuth);
 		<a class="menuitem active" href="#"><img src="images/events.png" /></a>
 	</header>
 	
+	<aside id="popups"></aside>
+	
 	<main id="view-list">
 	
 		<aside class="filter">
@@ -46,7 +50,7 @@ $graph = new Graph($oAuth);
 				<li><a data-month="7"  href="#">Jul</a></li>
 				<li><a data-month="8"  href="#">Aug</a></li>
 				<li><a data-month="9"  href="#">Sep</a></li>
-				<li><a data-month="10"  href="#">Okt</a></li>
+				<li><a data-month="10" href="#">Okt</a></li>
 				<li><a data-month="11" href="#">Nov</a></li>
 				<li><a data-month="12" href="#">Dez</a></li>
 			</ul>
@@ -82,14 +86,26 @@ $graph = new Graph($oAuth);
 				<h3>Allgemein</h3>
 				<input id="view-form-input-id" type="hidden" />
 				<input id="view-form-input-version" type="hidden" />
+				<div class="formitem size-small">
+					<label for="view-form-input-organizer">Veranstalter</label>
+					<select id="view-form-input-organizer">
+						<option value="club">Club</option>
+						<option value="bar">Bar</option>
+					</select>
+				</div>
+				<div class="formitem size-small">
+					<label for="view-form-input-status">Status</label>
+					<select id="view-form-input-status">
+						<option value="blocked"  >1. Geblockt</option>
+						<option value="commited" >2. Zugesagt</option>
+						<option value="announced">3. Angekündigt</option>
+						<option value="published">4. Vollständig</option>
+					</select>
+				</div>
 				<div class="formitem size-middle">
 					<label for="view-form-input-startTime-date">Datum & Spielbeginn</label>
 					<input id="view-form-input-startTime-date" type="date" required="required" />
 					<input id="view-form-input-startTime-time" type="time" required="required" style="flex: 1; " />
-				</div>
-				<div class="formitem size-small">
-					<label for="view-form-input-entry">Einlass</label>
-					<input id="view-form-input-entry" type="text" maxlength="255" />
 				</div>
 				<div class="formitem size-middle">
 					<label for="view-form-input-title">Titel</label>
@@ -103,6 +119,14 @@ $graph = new Graph($oAuth);
 					<label for="view-form-input-series">Reihe</label>
 					<input id="view-form-input-series" type="text" maxlength="255" />
 				</div>
+				<div class="formitem size-small">
+					<label for="view-form-input-color">Farbe</label>
+					<input id="view-form-input-color" type="color" />
+				</div>
+				<div class="formitem size-middle">
+					<label for="view-form-input-warning">Warnung</label>
+					<input id="view-form-input-warning" type="text" maxlength="255" />
+				</div>
 			</section>
 	
 			<section class="form">
@@ -114,6 +138,14 @@ $graph = new Graph($oAuth);
 				<div class="formitem">
 					<label for="view-form-input-lineup">Besetzung</label>
 					<textarea id="view-form-input-lineup" maxlength="16777215"></textarea>
+				</div>
+				<div class="formitem size-small">
+					<label for="view-form-input-price">Eintrittspreis</label>
+					<input id="view-form-input-price" type="text" maxlength="255" />
+				</div>
+				<div class="formitem size-small">
+					<label for="view-form-input-entry">Einlass</label>
+					<input id="view-form-input-entry" type="time" />
 				</div>
 				<div class="formitem">
 					<label for="view-form-input-notes">Bemerkung</label>
@@ -144,6 +176,7 @@ $graph = new Graph($oAuth);
 	
 			<section class="buttonbar">
 				<a id="view-form-button-delete" class="emergency" href="#">Löschen</a>
+				<a id="view-form-button-copy" href="#">Kopie erstellen</a>
 				<span class="flex-filler"></span>
 				<div class="group">
 					<a id="view-form-button-back" href="#">Zurück</a>

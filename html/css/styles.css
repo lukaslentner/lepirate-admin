@@ -26,12 +26,30 @@ a:link, a:visited, a:focus, a:active, a:hover {
 	color: inherit;
 }
 
+input, select, textarea {
+	padding: 6px;
+	height: 34px;
+	line-height: 20px;
+	display: flex;
+	align-items: center;
+	font-family: inherit;
+	font-size: inherit;
+}
+
 input, textarea {
-	font-family: sans-serif;
+	user-select: text;
 }
 
 input[type="file"], input[type="hidden"] {
 	display: none !important;
+}
+
+input[type="date"], input[type="time"] {
+	padding-left: calc(6px - 1px);
+}
+
+select {
+	padding-left: calc(6px - 4px);
 }
 
 ::-webkit-calendar-picker-indicator {
@@ -41,6 +59,14 @@ input[type="file"], input[type="hidden"] {
 
 ::-webkit-datetime-edit-fields-wrapper {
 	padding: 0;
+}
+
+::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+::-webkit-color-swatch {
+	border-width: 0;
 }
 
 ::placeholder {
@@ -98,6 +124,50 @@ header > .menuitem {
 
 header > .menuitem.active {
 	background-color: var(--primary-color);
+}
+
+#popups {
+	position: fixed;
+	top: 63px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: min(400px, calc(100vw - 20px));
+}
+
+#popups:empty {
+	display: none;
+}
+
+#popups > .popup {
+	background-color: var(--emergency-color);
+	color: white;
+	padding: 6px 12px;
+	margin-bottom: 20px;
+	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+	position: relative;
+}
+
+#popups > .popup > h2 {
+	font-size: 0.8rem;
+	margin: 6px 0;
+	padding: 0;
+	text-align: center;
+}
+
+#popups > .popup > p {
+	font-size: 0.7rem;
+	margin: 6px 0;
+	text-align: center;
+}
+
+#popups > .popup > .timer {
+	background-color: white;
+	opacity: 0.5;
+	height: 3px;
+	width: 0; 
+	position: absolute;
+	bottom: 0;
+	left: 0;
 }
 
 main {
@@ -168,31 +238,27 @@ main > .content > .form > .formitem > label:not(.no-label):after {
 	content: ':'
 }
 
-main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea {
-	font-size: 0.75rem;
+main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea, main > .content > .form > .formitem > select {
 	border: 1px solid #cccccc;
-	padding: 6px;
-	line-height: 160%;
     background-color: transparent;
     box-shadow: none;
 	outline: none;
 }
 
-main > .content > .form > .formitem > input:focus, main > .content > .form > .formitem > textarea:focus {
+main > .content > .form > .formitem > input:focus, main > .content > .form > .formitem > textarea:focus, main > .content > .form > .formitem > select:focus {
 	border-color: var(--primary-color);
 }
 
-main > .content > .form > .formitem > input:invalid, main > .content > .form > .formitem > textarea:invalid {
+main > .content > .form > .formitem > input:invalid, main > .content > .form > .formitem > textarea:invalid, main > .content > .form > .formitem > select:invalid {
 	border-color: var(--emergency-color);
 }
 
-main > .content > .form > .formitem > input {
+main > .content > .form > .formitem > input, main > .content > .form > .formitem > textarea, main > .content > .form > .formitem > select {
 	width: 0;
 }
 
 main > .content > .form > .formitem > textarea {
-	width: 0;
-	height: 150px;
+	height: 100px;
 	resize: vertical;
 }
 
@@ -290,6 +356,10 @@ main > .content > .buttonbar a.emergency:hover {
 
 main > .content > .buttonbar a.emergency:active {
 	background-color: var(--emergency-color-light);
+}
+
+#view-form-input-text {
+	height: 300px;
 }
 
 #view-list > .filter {

@@ -2,3 +2,11 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteCond %{HTTP_HOST} !=localhost
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+<FilesMatch "\.(gif|jpe?g|png|ico)$">
+	Header set Cache-Control "max-age=86400"
+</FilesMatch>
+
+<FilesMatch "\.(js|css)$">
+	Header set Cache-Control "no-cache"
+</FilesMatch>

@@ -11,20 +11,39 @@ class EventsGateway {
 	function __construct($db) {
 		$this->schema = json_decode(file_get_contents(dirname(__FILE__) . '/EventsSchema.json'), FALSE);
 		$this->db = $db;
-		$this->dbTypes = 'sissssssssss';
+		$this->dbTypes = 'sisssssssssssssss';
     }
 	
 	function list() {
-		
-		if(!isset($_GET['year']) || !is_numeric($_GET['year'])) {
-			throw new Exception('"year" is not set or is not numeric');
+
+		if(!isset($_GET['upcoming'])) {
+			$upcoming = null;
+		} else if(!is_numeric($_GET['upcoming'])) {
+			$upcoming = -1;
+		} else {
+			$upcoming = intval($_GET['upcoming']);
 		}
-		$year = intval($_GET['year']);
+
+		if(!isset($_GET['upcomingDays']) || !is_numeric($_GET['upcomingDays'])) {
+			$upcomingDays = null;
+		} else {
+			$upcomingDays = intval($_GET['upcomingDays']);
+		}
+
+		if(!isset($_GET['year']) || !is_numeric($_GET['year'])) {
+			$year = null;
+		} else {
+			$year = intval($_GET['year']);
+		}
 
 		if(!isset($_GET['month']) || !is_numeric($_GET['month'])) {
 			$month = null;
 		} else {
 			$month = intval($_GET['month']);
+		}
+		
+		if($upcoming === null && $upcomingDays === null && $year === null) {
+			throw new Exception('No filter present');
 		}
 
 		if(!isset($_GET['include'])) {
@@ -35,10 +54,14 @@ class EventsGateway {
 		
 		$sortDirection = isset($_GET['descending']) ? 'DESC' : 'ASC';
 
-		if($month === null) {
-			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection);
+		if($upcoming !== null) {
+			$events = $this->db->list('Events', self::columns($include), '`startTime` > NOW()', '', array(), 'startTime', $sortDirection, $upcoming >= 0 ? $upcoming : null);
+		} else if($upcomingDays !== null) {
+			$events = $this->db->list('Events', self::columns($include), '`startTime` > NOW() AND `startTime` <= NOW() + INTERVAL ? DAY', 'i', array($upcomingDays), 'startTime', $sortDirection, null);
+		} else if($month === null) {
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection, null);
 		} else {
-			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection);
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection, null);
 		}
 		
 		$eventDtos = array_map('self::writeEventDto', $events);
@@ -50,7 +73,7 @@ class EventsGateway {
 	
 	function listComingICal() {
 		
-		$events = $this->db->list('Events', self::columns(), '`startTime` > NOW()', '', array(), 'startTime', 'ASC');
+		$events = $this->db->list('Events', self::columns(), '`startTime` > NOW()', '', array(), 'startTime', 'ASC', null);
 		
 		$iCal = self::writeICalEvents($events);
 
@@ -145,6 +168,7 @@ class EventsGateway {
 			foreach($validator->getErrors() as $error) {
 				$errorMessage .= '\n' . $error['property'] . ': ' . $error['message'];
 			}
+			throw new Exception($errorMessage);
 		}
 		
 		$event = self::readEventDto($eventDto);
@@ -177,9 +201,9 @@ class EventsGateway {
 	
 	private static function columns($include = '') {
 		$includes = explode(',', $include);
-		$columns = array('id', 'version', 'startTime', 'entry', 'title', 'subtitle', 'series');
+		$columns = array('id', 'version', 'organizer', 'status', 'startTime', 'title', 'subtitle', 'series', 'color', 'warning');
 		if(in_array('content', $includes, TRUE)) {
-			$columns = array_merge($columns, array('text', 'lineup', 'notes'));
+			$columns = array_merge($columns, array('text', 'lineup', 'price', 'entry', 'notes'));
 		}
 		if(in_array('image', $includes, TRUE)) {
 			$columns = array_merge($columns, array('image'));
@@ -195,13 +219,18 @@ class EventsGateway {
 		$event = array();
 		$event['id']        = $eventDto->id;
 		$event['version']   = $eventDto->version;
+		$event['organizer'] = $eventDto->organizer;
+		$event['status']    = $eventDto->status;
 		$event['startTime'] = substr($eventDto->startTime, 0, 10) . ' ' . substr($eventDto->startTime, 11, 5) . ':00';
-		$event['entry']     = $eventDto->entry;
 		$event['title']     = $eventDto->title;
 		$event['subtitle']  = $eventDto->subtitle;
 		$event['series']    = $eventDto->series;
+		$event['color']     = $eventDto->color;
+		$event['warning']   = $eventDto->warning;
 		$event['text']      = $eventDto->text;
 		$event['lineup']    = $eventDto->lineup;
+		$event['price']     = $eventDto->price;
+		$event['entry']     = $eventDto->entry === null ? null : $eventDto->entry . ':00';
 		$event['notes']     = $eventDto->notes;
 		$event['image']     = $eventDto->image;
 		$event['links']     = json_encode($eventDto->links);
@@ -215,15 +244,20 @@ class EventsGateway {
 		$eventDto = array();
 		$eventDto['id']        = $event['id'];
 		$eventDto['version']   = $event['version'];
+		$eventDto['organizer'] = $event['organizer'];
+		$eventDto['status']    = $event['status'];
 		$eventDto['startTime'] = substr($event['startTime'], 0, 10) . 'T' . substr($event['startTime'], 11, 5);
-		$eventDto['entry']     = $event['entry'];
 		$eventDto['title']     = $event['title'];
 		$eventDto['subtitle']  = $event['subtitle'];
 		$eventDto['series']    = $event['series'];
+		$eventDto['color']     = $event['color'];
+		$eventDto['warning']   = $event['warning'];
 		
 		if(array_key_exists('text', $event)) {
 			$eventDto['text']   = $event['text'];
 			$eventDto['lineup'] = $event['lineup'];
+			$eventDto['price']  = $event['price'];
+			$eventDto['entry']  = substr($event['entry'], 0, 5);
 			$eventDto['notes']  = $event['notes'];
 		}
 		

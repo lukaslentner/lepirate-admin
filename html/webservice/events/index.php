@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../include.php');
+require_once(dirname(__FILE__) . '/../../php/include.php');
 
 $oAuth = new OAuth();
 $db = new DB();

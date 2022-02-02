@@ -70,6 +70,23 @@ const form_addLink = link => {
 	
 };
 
+const createPopup = content => {
+	const lifeTime = 10000;
+	const timerTime = 50;
+	let timerCount = 0;
+	const id = uuid();
+	$('#popups').append(`<section id="popup-${id}" class="popup">${content}<div class="timer"></div></section>`);
+	const interval = window.setInterval(() => {
+		timerCount++;
+		const newWidth = (timerCount * 100 * timerTime / lifeTime).toString() + '%';
+		$('#popup-' + id + ' .timer').width(newWidth);
+	}, timerTime);
+	window.setTimeout(() => {
+		clearInterval(interval);
+		$('#popup-' + id).remove();
+	}, lifeTime);
+};
+
 const form_init = () => {
 	$('#view-form .imageform .image-controls :nth-child(1) a').on('click', e => {
 		e.preventDefault();
@@ -90,6 +107,8 @@ const form_init = () => {
 			$('#view-form .imageform .image-wrapper').removeClass('loading');
 			if(e2.currentTarget.result.length > 16777215) {
 				console.error('Image too big');
+				form_setImage(null);
+				createPopup(`<h2>Bild zu groß</h2>`);
 				return;
 			}
 			form_setImage(e2.currentTarget.result);
@@ -122,13 +141,29 @@ const form_init = () => {
 		
 			},
 			error: (xhr, status, error) => {
-				//TODO
+				
 				console.error(error);
 				console.error(xhr);
+				
+				$('main').hide();
+				$('#view-form').show();
+				
+				createPopup(`<h2>Fehler beim Löschen</h2><p>${xhr.responseJSON.message}</p>`);
 				
 			},
 			method: 'DELETE'
 		});
+	});
+	$('#view-form-button-copy').on('click', e => {
+		e.preventDefault();
+		
+		const formData = form_get();
+		
+		const newHashParams = new URLSearchParams();
+		newHashParams.set('action', 'copy');
+		newHashParams.set('id', formData.id);
+				
+		window.location.hash = '#' + newHashParams.toString();
 	});
 	$('#view-form-button-back').on('click', e => {
 		e.preventDefault();
@@ -139,8 +174,9 @@ const form_init = () => {
 		if($('#view-form input:invalid').length > 0) {
 			console.error('Form invalid:', $('#view-form input:invalid'));
 			$('html, body').animate({
-				scrollTop: $('#view-form input:invalid').offset().top - 100
+				scrollTop: $('#view-form input:invalid').offset().top - 120
 			}, 300);
+			createPopup(`<h2>Formular nicht ausgefüllt</h2>`);
 			return;
 		}
 		
@@ -165,9 +201,14 @@ const form_init = () => {
 		
 			},
 			error: (xhr, status, error) => {
-				//TODO
+				
 				console.error(error);
 				console.error(xhr);
+				
+				$('main').hide();
+				$('#view-form').show();
+				
+				createPopup(`<h2>Fehler beim Speichern</h2><p>${xhr.responseJSON.message}</p>`);
 				
 			},
 			method: 'PUT'
@@ -222,13 +263,12 @@ const route = () => {
 	
 	if(hashParams.get('action') === 'list') {
 		route_list(hashParams);
-		return;
 	} else if(hashParams.get('action') === 'create') {
 		route_create(hashParams);
-		return;
 	} else if(hashParams.get('action') === 'edit') {
 		route_edit(hashParams);
-		return;
+	} else if(hashParams.get('action') === 'copy') {
+		route_copy(hashParams);
 	}
 	
 };
@@ -261,8 +301,8 @@ const route_list = hashParams => {
 				<span class="marker"></span>
 				<span class="monthday">${dayDate.getDate()}</span>
 				<span class="weekday">${weekdayNicks[dayDate.getDay()]}</span>
-				<span class="events"></span>
 				<a class="tool create" href="#">+</a>
+				<span class="events"></span>
 			</section>`);
 		
 	}
@@ -302,9 +342,11 @@ const route_list = hashParams => {
 	
 		},
 		error: (xhr, status, error) => {
-			//TODO
+				
 			console.error(error);
 			console.error(xhr);
+			
+			createPopup(`<h2>Fehler beim Laden</h2><p>${xhr.responseJSON.message}</p>`);
 			
 		},
 		method: 'GET'
@@ -315,14 +357,19 @@ const route_list = hashParams => {
 const form_set = event => {
 	$('#view-form-input-id'            ).val(event.id);
 	$('#view-form-input-version'       ).val(event.version ?? '');
-	$('#view-form-input-startTime-date').val(event.startTime.substr(0, 10));
-	$('#view-form-input-startTime-time').val(event.startTime.substr(11, 5));
-	$('#view-form-input-entry'         ).val(event.entry);
+	$('#view-form-input-organizer'     ).val(event.organizer);
+	$('#view-form-input-status'        ).val(event.status);
+	$('#view-form-input-startTime-date').val(event.startTime.split('T')[0]);
+	$('#view-form-input-startTime-time').val(event.startTime.split('T')[1]);
 	$('#view-form-input-title'         ).val(event.title);
 	$('#view-form-input-subtitle'      ).val(event.subtitle);
 	$('#view-form-input-series'        ).val(event.series);
+	$('#view-form-input-color'         ).val(event.color);
+	$('#view-form-input-warning'       ).val(event.warning);
 	$('#view-form-input-text'          ).val(event.text);
 	$('#view-form-input-lineup'        ).val(event.lineup);
+	$('#view-form-input-price'         ).val(event.price);
+	$('#view-form-input-entry'         ).val(event.entry ?? '');
 	$('#view-form-input-notes'         ).val(event.notes);
 	form_setImage(event.image);
 	form_clearLinks();
@@ -333,13 +380,18 @@ const form_get = () => {
 	return {
 		id: $('#view-form-input-id').val(),
 		version: parseInt($('#view-form-input-version').val()) || null,
+		organizer: $('#view-form-input-organizer').val(),
+		status: $('#view-form-input-status').val(),
 		startTime: $('#view-form-input-startTime-date').val() + 'T' + $('#view-form-input-startTime-time').val(),
-		entry: $('#view-form-input-entry').val(),
 		title: $('#view-form-input-title').val(),
 		subtitle: $('#view-form-input-subtitle').val(),
 		series: $('#view-form-input-series').val(),
+		color: $('#view-form-input-color').val(),
+		warning: $('#view-form-input-warning').val(),
 		text: $('#view-form-input-text').val(),
 		lineup: $('#view-form-input-lineup').val(),
+		price: $('#view-form-input-price').val(),
+		entry: $('#view-form-input-entry').val() || null,
 		notes: $('#view-form-input-notes').val(),
 		image: $('#view-form-input-image').val() || null,
 		links: $('#view-form .linkform > .link').get().map(link => { return { text: $(link).find('input[type="text"]').val(), target: $(link).find('input[type="url"]').val() }; })
@@ -353,22 +405,27 @@ const route_create = hashParams => {
 	
 	$('#view-form h2').text('Veranstaltung erstellen');
 	$('#view-form-button-delete').hide();
+	$('#view-form-button-copy').hide();
 	
 	form_set({
 		id: uuid(),
 		version: null,
-		startTime: hashParams.get('date') + 'T00:00',
-		entry: '',
+		organizer: 'club',
+		status: 'blocked',
+		startTime: hashParams.get('date') + 'T20:00',
 		title: '',
 		subtitle: '',
 		series: '',
+		color: '#333333',
+		warning: '',
 		text: '',
 		lineup: '',
+		price: '',
+		entry: '19:00',
 		notes: '',
 		image: null,
 		links: []
 	});
-	$('#view-form-input-startTime-time').val('');
 	
 	$('main').hide();
 	$('#view-form').show();
@@ -382,6 +439,7 @@ const route_edit = hashParams => {
 	
 	$('#view-form h2').text('Veranstaltung bearbeiten');
 	$('#view-form-button-delete').show();
+	$('#view-form-button-copy').show();
 	
 	$.ajax({
 		dataType: 'json',
@@ -395,9 +453,52 @@ const route_edit = hashParams => {
 	
 		},
 		error: (xhr, status, error) => {
-			//TODO
+				
 			console.error(error);
 			console.error(xhr);
+			
+			window.history.back();
+			
+			createPopup(`<h2>Fehler beim Laden</h2><p>${xhr.responseJSON.message}</p>`);
+			
+		},
+		method: 'GET'
+	});
+	
+};
+
+const route_copy = hashParams => {
+	
+	$('main').hide();
+	$('#view-loading').show();
+	
+	$('#view-form h2').text('Veranstaltungskopie erstellen');
+	$('#view-form-button-delete').hide();
+	$('#view-form-button-copy').hide();
+	
+	$.ajax({
+		dataType: 'json',
+		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,links',
+		success: (data, status, xhr) => {
+			
+			data.id = uuid();
+			data.version = null;
+			data.status = 'blocked';
+			data.startTime = 'T' + data.startTime.split('T')[1];
+			form_set(data);
+			
+			$('main').hide();
+			$('#view-form').show();
+	
+		},
+		error: (xhr, status, error) => {
+				
+			console.error(error);
+			console.error(xhr);
+			
+			window.history.back();
+			
+			createPopup(`<h2>Fehler beim Laden</h2><p>${xhr.responseJSON.message}</p>`);
 			
 		},
 		method: 'GET'
