@@ -11,7 +11,7 @@ class EventsGateway {
 	function __construct($db) {
 		$this->schema = json_decode(file_get_contents(dirname(__FILE__) . '/EventsSchema.json'), FALSE);
 		$this->db = $db;
-		$this->dbTypes = 'sisssssssssssssss';
+		$this->dbTypes = 'sissssssssssssssss';
     }
 	
 	function list() {
@@ -156,6 +156,34 @@ class EventsGateway {
 		
 	}
 	
+	function getImage2() {
+		
+		if(!isset($_GET['id'])) {
+			throw new Exception('"id" is not set');
+		}
+		$id = $_GET['id'];
+		
+		if(isset($_SERVER['HTTP_IF_NONE_MATCH']) && intval($_SERVER['HTTP_IF_NONE_MATCH']) === $this->db->getVersion('Events', $id)) {
+			http_response_code(304);
+			exit;
+		}
+
+		$event = $this->db->get('Events', array('version', 'image2'), $id);
+		
+		if($event['image2'] === null) {
+			throw new Exception('No image2 set');
+		}
+
+		$eventImageParts = preg_split('/:|;|,/', $event['image2']);
+		$imageType = $eventImageParts[1];
+		$imageData = base64_decode($eventImageParts[3], TRUE);
+
+		header('Content-Type: ' . $imageType);
+		header('ETag: ' . $event['version']);
+		echo $imageData;
+		
+	}
+	
 	function put() {
 		
 		$eventDto = json_decode(file_get_contents('php://input'), FALSE);
@@ -208,6 +236,9 @@ class EventsGateway {
 		if(in_array('image', $includes, TRUE)) {
 			$columns = array_merge($columns, array('image'));
 		}
+		if(in_array('image2', $includes, TRUE)) {
+			$columns = array_merge($columns, array('image2'));
+		}
 		if(in_array('links', $includes, TRUE)) {
 			$columns = array_merge($columns, array('links'));
 		}
@@ -233,6 +264,7 @@ class EventsGateway {
 		$event['entry']     = $eventDto->entry === null ? null : $eventDto->entry . ':00';
 		$event['notes']     = $eventDto->notes;
 		$event['image']     = $eventDto->image;
+		$event['image2']    = $eventDto->image2;
 		$event['links']     = json_encode($eventDto->links);
 		
 		return $event;
@@ -263,6 +295,10 @@ class EventsGateway {
 		
 		if(array_key_exists('image', $event)) {
 			$eventDto['image'] = $event['image'];
+		}
+		
+		if(array_key_exists('image2', $event)) {
+			$eventDto['image2'] = $event['image2'];
 		}
 		
 		if(array_key_exists('links', $event)) {

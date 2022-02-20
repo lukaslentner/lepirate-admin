@@ -13,6 +13,8 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
 	if(isset($_GET['id'])) {
 		if(isset($_GET['image'])) {
 			$eventsGateway->getImage();
+		} else if(isset($_GET['image2'])) {
+			$eventsGateway->getImage2();
 		} else {
 			$eventsGateway->get();
 		}

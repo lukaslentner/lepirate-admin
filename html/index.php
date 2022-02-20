@@ -153,7 +153,7 @@ $graph = new Graph($oAuth);
 				</div>
 			</section>
 			
-			<section class="form imageform">
+			<section id="view-form-input-image-form" class="form imageform">
 				<h3>Bild</h3>
 				<div class="formitem size-small">
 					<label>Vorschau</label>
@@ -164,6 +164,20 @@ $graph = new Graph($oAuth);
 					<span><a href="#">Aktuelles Bild löschen</a></span>
 					<input id="view-form-input-image" type="hidden" />
 					<input id="view-form-input-image-browse" type="file" />
+				</div>
+			</section>
+			
+			<section id="view-form-input-image2-form" class="form imageform">
+				<h3>Bild 2</h3>
+				<div class="formitem size-small">
+					<label>Vorschau</label>
+					<div class="image-wrapper"></div>
+				</div>
+				<div class="image-controls">
+					<span><a href="#">Lokale Datei auswählen</a></span>
+					<span><a href="#">Aktuelles Bild löschen</a></span>
+					<input id="view-form-input-image2" type="hidden" />
+					<input id="view-form-input-image2-browse" type="file" />
 				</div>
 			</section>
 	

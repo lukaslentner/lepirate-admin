@@ -28,15 +28,31 @@ const list_init = () => {
 const form_setImage = image => {
 	
 	if(image === null) {
-		$('#view-form .imageform .image-wrapper').empty();
-		$('#view-form .imageform .image-controls :nth-child(2)').hide();
-		$('#view-form .imageform .image-controls input[type="hidden"]').val('');
-		$('#view-form .imageform .image-controls input[type="file"]').val('');
+		$('#view-form-input-image-form .image-wrapper').empty();
+		$('#view-form-input-image-form .image-controls :nth-child(2)').hide();
+		$('#view-form-input-image-form .image-controls input[type="hidden"]').val('');
+		$('#view-form-input-image-form .image-controls input[type="file"]').val('');
 	} else {
-		$('#view-form .imageform .image-wrapper').empty();
-		$('#view-form .imageform .image-wrapper').append(`<img src="${image}" />`);
-		$('#view-form .imageform .image-controls :nth-child(2)').show();
-		$('#view-form .imageform .image-controls input[type="hidden"]').val(image);
+		$('#view-form-input-image-form .image-wrapper').empty();
+		$('#view-form-input-image-form .image-wrapper').append(`<img src="${image}" />`);
+		$('#view-form-input-image-form .image-controls :nth-child(2)').show();
+		$('#view-form-input-image-form .image-controls input[type="hidden"]').val(image);
+	}
+	
+};
+//TODO: REMOVE duplicate code for image2
+const form_setImage2 = image => {
+	
+	if(image === null) {
+		$('#view-form-input-image2-form .image-wrapper').empty();
+		$('#view-form-input-image2-form .image-controls :nth-child(2)').hide();
+		$('#view-form-input-image2-form .image-controls input[type="hidden"]').val('');
+		$('#view-form-input-image2-form .image-controls input[type="file"]').val('');
+	} else {
+		$('#view-form-input-image2-form .image-wrapper').empty();
+		$('#view-form-input-image2-form .image-wrapper').append(`<img src="${image}" />`);
+		$('#view-form-input-image2-form .image-controls :nth-child(2)').show();
+		$('#view-form-input-image2-form .image-controls input[type="hidden"]').val(image);
 	}
 	
 };
@@ -88,23 +104,23 @@ const createPopup = content => {
 };
 
 const form_init = () => {
-	$('#view-form .imageform .image-controls :nth-child(1) a').on('click', e => {
+	$('#view-form-input-image-form .image-controls :nth-child(1) a').on('click', e => {
 		e.preventDefault();
-		$('#view-form .imageform .image-controls input[type="file"]').click();
+		$('#view-form-input-image-form .image-controls input[type="file"]').click();
 	});
-	$('#view-form .imageform .image-controls :nth-child(2) a').on('click', e => {
+	$('#view-form-input-image-form .image-controls :nth-child(2) a').on('click', e => {
 		e.preventDefault();
 		form_setImage(null);
 	});
-	$('#view-form .imageform .image-controls input[type="file"]').on('change', e => {
-		$('#view-form .imageform .image-wrapper').addClass('loading').empty();
+	$('#view-form-input-image-form .image-controls input[type="file"]').on('change', e => {
+		$('#view-form-input-image-form .image-wrapper').addClass('loading').empty();
 		const files = e.currentTarget.files;
 		if(files.length !== 1) return;
 		const file = files[0];
 		if(!file.type.match(/image\/.+/)) return;
 		const fileReader = new FileReader();
 		fileReader.onload = e2 => {
-			$('#view-form .imageform .image-wrapper').removeClass('loading');
+			$('#view-form-input-image-form .image-wrapper').removeClass('loading');
 			if(e2.currentTarget.result.length > 16777215) {
 				console.error('Image too big');
 				form_setImage(null);
@@ -112,6 +128,34 @@ const form_init = () => {
 				return;
 			}
 			form_setImage(e2.currentTarget.result);
+		};
+		fileReader.readAsDataURL(file);
+	});
+	//TODO: REMOVE duplicate code for image2
+	$('#view-form-input-image2-form .image-controls :nth-child(1) a').on('click', e => {
+		e.preventDefault();
+		$('#view-form-input-image2-form .image-controls input[type="file"]').click();
+	});
+	$('#view-form-input-image2-form .image-controls :nth-child(2) a').on('click', e => {
+		e.preventDefault();
+		form_setImage2(null);
+	});
+	$('#view-form-input-image2-form .image-controls input[type="file"]').on('change', e => {
+		$('#view-form-input-image2-form .image-wrapper').addClass('loading').empty();
+		const files = e.currentTarget.files;
+		if(files.length !== 1) return;
+		const file = files[0];
+		if(!file.type.match(/image\/.+/)) return;
+		const fileReader = new FileReader();
+		fileReader.onload = e2 => {
+			$('#view-form-input-image2-form .image-wrapper').removeClass('loading');
+			if(e2.currentTarget.result.length > 16777215) {
+				console.error('Image2 too big');
+				form_setImage2(null);
+				createPopup(`<h2>Bild 2 zu groß</h2>`);
+				return;
+			}
+			form_setImage2(e2.currentTarget.result);
 		};
 		fileReader.readAsDataURL(file);
 	});
@@ -372,6 +416,7 @@ const form_set = event => {
 	$('#view-form-input-entry'         ).val(event.entry ?? '');
 	$('#view-form-input-notes'         ).val(event.notes);
 	form_setImage(event.image);
+	form_setImage2(event.image2);
 	form_clearLinks();
 	event.links.forEach(link => form_addLink(link));
 };
@@ -394,6 +439,7 @@ const form_get = () => {
 		entry: $('#view-form-input-entry').val() || null,
 		notes: $('#view-form-input-notes').val(),
 		image: $('#view-form-input-image').val() || null,
+		image2: $('#view-form-input-image2').val() || null,
 		links: $('#view-form .linkform > .link').get().map(link => { return { text: $(link).find('input[type="text"]').val(), target: $(link).find('input[type="url"]').val() }; })
 	}
 };
@@ -424,6 +470,7 @@ const route_create = hashParams => {
 		entry: '19:00',
 		notes: '',
 		image: null,
+		image2: null,
 		links: []
 	});
 	
@@ -443,7 +490,7 @@ const route_edit = hashParams => {
 	
 	$.ajax({
 		dataType: 'json',
-		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,links',
+		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,image2,links',
 		success: (data, status, xhr) => {
 			
 			form_set(data);
@@ -478,7 +525,7 @@ const route_copy = hashParams => {
 	
 	$.ajax({
 		dataType: 'json',
-		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,links',
+		url: 'webservice/events/?id=' + hashParams.get('id') + '&include=content,image,image2,links',
 		success: (data, status, xhr) => {
 			
 			data.id = uuid();
