@@ -10,7 +10,7 @@
 			"minimum": 0
 		},
 		"organizer": {
-			"enum": ["club", "bar"]
+			"enum": ["club", "bar", "misc"]
 		},
 		"status": {
 			"enum": ["blocked", "commited", "announced", "published"]

@@ -91,6 +91,7 @@ $graph = new Graph($oAuth);
 					<select id="view-form-input-organizer">
 						<option value="club">Club</option>
 						<option value="bar">Bar</option>
+						<option value="misc">Sonstige</option>
 					</select>
 				</div>
 				<div class="formitem size-small">
