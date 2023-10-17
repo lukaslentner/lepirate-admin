@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+
+<script src="template.svg.js"></script>
+<script>
+
+const load = async () => {
+
+	const eventFilter = event => (event.startTime.getMonth() >= 2 && event.startTime.getMonth() <= 4);
+	const width = 1200;
+	const height = 120;
+	const separatedImages = true;
+	const separatorSize = 10;
+	const separatorColor = 'red';
+	
+	const convertEventToSvg = event => {
+	
+		const data = {
+			image2: event.image2,
+			weekday: weekdays[event.startTime.getDay()],
+			date: event.startTime.getDate(),
+			month: months[event.startTime.getMonth()],
+			series: event.series,
+			color: event.color,
+			title: event.title,
+			subtitle: event.subtitle
+		};
+
+		return fillSvgTemplate(width, height, data);
+	
+	};
+
+	const convertSvgsToPng = async svgDatas => {
+		
+		const canvasElement = document.createElement('canvas');
+		canvasElement.width = width;
+		canvasElement.height = (height * svgDatas.length) + (separatorSize * (svgDatas.length - 1));
+		const canvasContext = canvasElement.getContext('2d');
+		canvasContext.fillStyle = separatorColor;
+		canvasContext.fillRect(0, 0, canvasElement.width, canvasElement.height);
+		
+		await Promise.all(svgDatas.map((svgData, svgDataIndex) => new Promise(resolve => {
+			
+			const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+			const svgReader = new FileReader();
+			svgReader.addEventListener('load', () => {
+			
+				const image = new Image();
+				image.addEventListener('load', () => {
+				
+					canvasContext.drawImage(image, 0, svgDataIndex * (height + separatorSize));
+					resolve();
+				
+				});
+				image.src = svgReader.result;
+			
+			}, false);
+			svgReader.readAsDataURL(svgBlob);
+			
+		})));
+		
+		return canvasElement.toDataURL();
+		
+	};
+	
+	const renderImage = (pngData, filename) => {
+	
+		const eventElement = document.createElement('div');
+		eventElement.className = 'image';
+		document.body.appendChild(eventElement);
+
+		const anchorElement = document.createElement('a');
+		anchorElement.href = pngData;
+		anchorElement.download = filename;
+		eventElement.appendChild(anchorElement);
+		
+		const imageElement = document.createElement('img');
+		imageElement.src = pngData;
+		imageElement.title = filename;
+		imageElement.alt = filename;
+		anchorElement.appendChild(imageElement);
+	
+	};
+	
+	const renderSeparatedImages = async events => {
+	
+		events.forEach(async event => {
+			
+			const svgData = convertEventToSvg(event);
+			const pngData = await convertSvgsToPng([svgData]);
+			
+			renderImage(pngData, `${event.startTime.toISOString().slice(0, 10)} - ${event.title.replace(/[^a-zA-Z0-9öüäÖÜÄß ]+/g, '_')}`);
+			
+		});
+	
+	};
+	
+	const renderListImage = async events => {
+	
+		const svgDatas = events.map(convertEventToSvg);
+		const pngData = await convertSvgsToPng(svgDatas);
+			
+		renderImage(pngData, 'List');
+	
+	};
+	
+	const webservice = 'https://admin.lepirate-rosenheim.de/webservice/public/events/';
+	const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+	const months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+		
+	const ajax = new XMLHttpRequest();
+	ajax.open('GET', webservice + '?upcoming&include=image2');
+	ajax.onload = () => {
+	
+		const response = JSON.parse(ajax.responseText);
+		
+		if(ajax.status !== 200) {
+			console.log(response);
+			return;
+		}
+		
+		const events = response.map(event => {
+			event.startTime = new Date(event.startTime);
+			return event;
+		}).filter(eventFilter);
+		
+		if(separatedImages) {
+			renderSeparatedImages(events);
+		} else {
+			renderListImage(events);
+		}
+		
+	};
+	ajax.send();
+		
+};
+
+</script>
+
+<style>
+
+body {
+	margin: 0;
+	padding: 20px 20px 0 20px;
+}
+
+.image {
+	margin-bottom: 20px;
+}
+
+.image > a {
+	display: inline-block;
+}
+
+.image > a > img {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+</style>
+	
+</head>
+<body onload="load()">
+
+</body>
+</html>
