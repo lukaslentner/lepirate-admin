@@ -55,9 +55,9 @@ class EventsGateway {
 		$sortDirection = isset($_GET['descending']) ? 'DESC' : 'ASC';
 
 		if($upcoming !== null) {
-			$events = $this->db->list('Events', self::columns($include), '`startTime` > NOW()', '', array(), 'startTime', $sortDirection, $upcoming >= 0 ? $upcoming : null);
+			$events = $this->db->list('Events', self::columns($include), 'DATE(`startTime`) >= DATE(NOW())', '', array(), 'startTime', $sortDirection, $upcoming >= 0 ? $upcoming : null);
 		} else if($upcomingDays !== null) {
-			$events = $this->db->list('Events', self::columns($include), '`startTime` > NOW() AND `startTime` <= NOW() + INTERVAL ? DAY', 'i', array($upcomingDays), 'startTime', $sortDirection, null);
+			$events = $this->db->list('Events', self::columns($include), 'DATE(`startTime`) >= DATE(NOW()) AND DATE(`startTime`) <= DATE(NOW()) + INTERVAL ? DAY', 'i', array($upcomingDays), 'startTime', $sortDirection, null);
 		} else if($month === null) {
 			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection, null);
 		} else {
