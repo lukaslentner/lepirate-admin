@@ -41,10 +41,6 @@ class EventsGateway {
 		} else {
 			$month = intval($_GET['month']);
 		}
-		
-		if($upcoming === null && $upcomingDays === null && $year === null) {
-			throw new Exception('No filter present');
-		}
 
 		if(!isset($_GET['include'])) {
 			$include = '';
@@ -58,10 +54,12 @@ class EventsGateway {
 			$events = $this->db->list('Events', self::columns($include), 'DATE(`startTime`) >= DATE(NOW())', '', array(), 'startTime', $sortDirection, $upcoming >= 0 ? $upcoming : null);
 		} else if($upcomingDays !== null) {
 			$events = $this->db->list('Events', self::columns($include), 'DATE(`startTime`) >= DATE(NOW()) AND DATE(`startTime`) <= DATE(NOW()) + INTERVAL ? DAY', 'i', array($upcomingDays), 'startTime', $sortDirection, null);
-		} else if($month === null) {
+		} else if($year !== null && $month !== null) {
+			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection, null);
+		} else if($year !== null && $month === null) {
 			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ?', 'i', array($year), 'startTime', $sortDirection, null);
 		} else {
-			$events = $this->db->list('Events', self::columns($include), 'YEAR(`startTime`) = ? AND MONTH(`startTime`) = ?', 'ii', array($year, $month), 'startTime', $sortDirection, null);
+			$events = $this->db->list('Events', self::columns($include), '1 = 1', '', array(), 'startTime', $sortDirection, null);
 		}
 		
 		$eventDtos = array_map('self::writeEventDto', $events);
