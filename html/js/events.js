@@ -1,5 +1,5 @@
 const weekdayNicks = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-const monthNames = ['Januar', 'Feburar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
 const list_filter = {};
 const list_init = () => {
